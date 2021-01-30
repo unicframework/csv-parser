@@ -78,7 +78,7 @@ $data = $csv->toJson(['Name', 'Email']);
 
 ```php
 //Get parsed data to csv format
-$data = $csv->toObject();
+$data = $csv->toCsv();
 
 //Select data from parsed data
 $data = $csv->toCsv(['Name', 'Email']);
