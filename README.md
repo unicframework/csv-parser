@@ -92,16 +92,16 @@ $data = $csv->toArray();
 ### Set CSV Header
 
 ```php
-//Ignore csv header
-$csv->IgnoreHeader(true);
+//Ignore header from csv file
+$csv->ignoreHeader(true);
 
 //Ignore csv header cse
 $csv->ignoreHeaderCase(true);
 
-//Set csv header offset
+//Set header offset of csv file
 $csv->headerOffset(0);
 
-//Set csv custom header
+//Set custom header to csv file
 $csv->setHeader(['Name', 'Email']);
 ```
 
