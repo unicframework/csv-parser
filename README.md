@@ -115,6 +115,9 @@ $csv->ignoreHeaderCase(true);
 
 //Set csv header offset
 $csv->headerOffset(0);
+
+//Set csv custom header
+$csv->setHeader(['Name', 'Email']);
 ```
 
 
