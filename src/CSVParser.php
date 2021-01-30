@@ -10,6 +10,7 @@
 */
 
 namespace CSVParser;
+use Exception;
 
 class CSV {
   private $delimiter = ',';
@@ -21,6 +22,12 @@ class CSV {
   private $limit = [];
   private $parsedData = [];
 
+  /**
+  * Parse data
+  *
+  * @param string $data
+  * @return void
+  */
   function parse($data) {
     $rawData = NULL;
     //Check data type
@@ -41,20 +48,44 @@ class CSV {
           }
           $rawData = $tmpData;
         } else {
-          //throw error
+          //Throw error
+          throw new Exception('Error: Can not read file, permission denied');
         }
+      } else {
+        //Throw error
+        throw new Exception('Error: Csv file not found');
       }
     } else {
-      //throw error
+      //Throw error
+      throw new Exception('Error: CSVParser invalid data type');
     }
     //Parse data
     if(!empty($rawData)) {
-      if($this->ignoreHeader === true) {
-        $this->parsedData = $rawData;
+      if($this->ignoreHeader == true) {
+        if(!empty($this->header)) {
+          //Parse body data
+          $parseData = [];
+          foreach($rawData as $row) {
+            $tmpData = array();
+            foreach($row as $key => $value) {
+              if(isset($this->header[$key])) {
+                $tmpData[$this->header[$key]] = $value;
+              } else {
+                $tmpData[count($tmpData)] = $value;
+              }
+            }
+            if(!empty($tmpData)) {
+              $parseData[] = $tmpData;
+            }
+          }
+          $this->parsedData = $parseData;
+        } else {
+          $this->parsedData = $rawData;
+        }
       } else {
         //Parse header
         if(empty($this->header)) {
-          if($this->headerOffset === 0) {
+          if($this->headerOffset == 0) {
             $this->header = $rawData[0];
             //Remove header from data
             array_shift($rawData);
@@ -63,7 +94,8 @@ class CSV {
             //Remove header from data
             unset($rawData[$this->headerOffset]);
           } else {
-            //throw error header not found
+            //Throw error header not found
+            throw new Exception('Error: Header not found');
           }
         }
         //Parse body data
@@ -86,30 +118,71 @@ class CSV {
     }
   }
 
-  function setDelimiter(string $delimeter) {
+  /**
+  * Set csv delimiter
+  *
+  * @param string $delimiter
+  * @return void
+  */
+  function setDelimiter(string $delimiter) {
     $this->delimiter = $delimiter;
   }
 
+  /**
+  * Ignore csv header
+  *
+  * @param boolean $ignore
+  * @return void
+  */
   function ignoreHeader(bool $ignore) {
     $this->ignoreHeader = $ignore;
   }
 
+  /**
+  * Ignore csv header case
+  *
+  * @param boolean $ignore
+  * @return void
+  */
   function ignoreHeaderCase(bool $ignore) {
     $this->ignoreHeaderCase = $ignore;
   }
 
+  /**
+  * Set csv header offset
+  *
+  * @param integer $offset
+  * @return void
+  */
   function headerOffset(int $offset) {
     $this->headerOffset = $offset;
   }
 
+  /**
+  * Set csv header
+  *
+  * @param array $header
+  * @return void
+  */
   function setHeader(array $header) {
     $this->header = $header;
   }
 
-  function rowCount() {
+  /**
+  * Get parsed data row count
+  *
+  * @return integer
+  */
+  function rowCount() : int {
     return count($this->parsedData);
   }
 
+  /**
+  * Set data limit
+  *
+  * @param array $limit
+  * @return void
+  */
   function limit(...$limit) {
     if(count($limit) == 2) {
       if(isset($limit[0])) {
@@ -132,7 +205,13 @@ class CSV {
     }
   }
 
-  function toArray(array $header=NULL) {
+  /**
+  * Get parsed data to array
+  *
+  * @param array $header
+  * @return array
+  */
+  function toArray(array $header=NULL) : array {
     $parseHeader = [];
     $parseData = [];
     if(!empty($header)) {
@@ -154,7 +233,8 @@ class CSV {
           $col = strtolower($col);
         }
         if(!array_key_exists($col, $tmpHeader)) {
-          //throw error header not found
+          //Throw error header not found
+          throw new Exception("Error: '".$tmpCol."' header not found");
         } else {
           $parseHeader[$tmpCol] = $tmpHeader[$col];
         }
@@ -179,40 +259,68 @@ class CSV {
         }
       }
     } else {
-      $parseData = $this->parsedData;
+      //Parse body data
+      if(!empty($this->limit)) {
+        if(isset($this->limit['start']) && isset($this->limit['end'])) {
+          $tmpParsedData = array_slice($this->parsedData, $this->limit['start'], $this->limit['end']);
+        } else if(isset($this->limit['start'])) {
+          $tmpParsedData = array_slice($this->parsedData, $this->limit['start']);
+        }
+        $parseData = $tmpParsedData;
+      } else {
+        $parseData = $this->parsedData;
+      }
     }
     return $parseData;
   }
 
-  function toObject(array $header=NULL) {
+  /**
+  * Get parsed data to object
+  *
+  * @param array $header
+  * @return object
+  */
+  function toObject(array $header=NULL) : object {
     return (object) $this->toArray($header);
   }
 
-  function toJson(array $header=NULL) {
+  /**
+  * Get parsed data to json
+  *
+  * @param array $header
+  * @return string
+  */
+  function toJson(array $header=NULL) : string {
     return json_encode($this->toArray($header));
   }
 
-  function toCsv(array $header=NULL) {
+  /**
+  * Get parsed data to csv
+  *
+  * @param array $header
+  * @return string
+  */
+  function toCsv(array $header=NULL) : string {
     $parsedData = $this->toArray($header);
     $csvData = '';
     if(!empty($parsedData)) {
-    if($this->ignoreHeader == false && !empty($header)) {
-      $csvData .= implode($this->delimiter, $header).PHP_EOL;
-    }
-    foreach($parsedData as $row) {
-      $csvData .= implode($this->delimiter, $row).PHP_EOL;
-    }
+      if($this->ignoreHeader == false && !empty($header)) {
+        $csvData .= implode($this->delimiter, $header).PHP_EOL;
+      }
+      foreach($parsedData as $row) {
+        $csvData .= implode($this->delimiter, $row).PHP_EOL;
+      }
     }
     return $csvData;
   }
-  
+
   /**
   * Check Json format is valid or not.
   *
   * @param mixed $data
   * @return boolean
   */
-  private function is_json($data) {
+  private function is_json($data) : bool {
     return is_array($data) ? false : is_array(json_decode($data, true));
   }
 }
