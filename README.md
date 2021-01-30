@@ -20,40 +20,28 @@
 composer require unicframework/csv-parser
 ```
 
-### Parse data from csv file.
+### Parse data
 
 ```php
 use CSVParser\CSV;
 
 $csv = new CSV();
 
-//Parse csv file data
+//Parse data from csv file
 $csv->parse('data.csv');
-```
 
-### Parse data from array
-
-```php
 //Parse array data
 $csv->parse($arrayData);
-```
 
-### Parse json data
-
-```php
-//Parse json data
+//Parse object data
 $csv->parse($jsonData);
-```
 
-### Parse form object
-
-```php
 //Parse json data
 $csv->parse($objectData);
 ```
 
 
-### Get data in array format
+### Get parsed data
 
 ```php
 //Get parsed data to array format
@@ -61,31 +49,19 @@ $data = $csv->toArray();
 
 //Select data from parsed data
 $data = $csv->toArray(['Name', 'Email']);
-```
 
-### Get data in object format
-
-```php
 //Get parsed data to object format
 $data = $csv->toObject();
 
 //Select data from parsed data
 $data = $csv->toObject(['Name', 'Email']);
-```
 
-### Get data in json format
-
-```php
 //Get parsed data to json format
 $data = $csv->toJson();
 
 //Select data from parsed data
 $data = $csv->toJson(['Name', 'Email']);
-```
 
-### Get data in csv format
-
-```php
 //Get parsed data to csv format
 $data = $csv->toCsv();
 
@@ -113,7 +89,7 @@ $data = $csv->toArray();
 ```
 
 
-### CSV Header
+### Set CSV Header
 
 ```php
 //Ignore csv header
@@ -130,7 +106,7 @@ $csv->setHeader(['Name', 'Email']);
 ```
 
 
-### CSV delimiter
+### Set CSV delimiter
 
   Default csv delimiter is `,` but we can set other delimiter for csv file.
 
