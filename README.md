@@ -1,11 +1,15 @@
-## CSVParser Library
+## CSVParser
+
+<p align="center">
+  <img src="logo.jpg" width="400px" alt="Unic Logo">
+</p>
 
   CSVParser library parse csv data to array, object, and json format. CSVParser convert array, object, json to csv format.
 
 
 ### Features
 
-- Parse data from csv file.
+- Parse data from csv file, array and object.
 - Parse csv to array and array to csv.
 - Parse csv to object and object to csv.
 - Parse csv to json and json to csv.
