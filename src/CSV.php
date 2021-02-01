@@ -315,8 +315,8 @@ class CSV {
     $parsedData = $this->toArray($header);
     $csvData = '';
     if(!empty($parsedData)) {
-      if($this->ignoreHeader == false && !empty($header)) {
-        $csvData .= implode($this->delimiter, $header).PHP_EOL;
+      if(!empty($this->header)) {
+        $csvData .= implode($this->delimiter, $this->header).PHP_EOL;
       }
       foreach($parsedData as $row) {
         $csvData .= implode($this->delimiter, $row).PHP_EOL;
