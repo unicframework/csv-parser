@@ -41,7 +41,7 @@ class CSV {
       if(is_file($data)) {
         if(is_readable($data)) {
           //Read data from file
-          $fileData = file('data.csv', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+          $fileData = file($data, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
           $tmpData = [];
           foreach($fileData as $row) {
             $tmpData[] = array_map('trim', explode($this->delimiter, $row));
