@@ -339,6 +339,8 @@ class CSV {
             $parseHeader[$tmpCol] = $tmpHeader[$col];
           }
         }
+      } else {
+        $parseHeader = $this->header;
       }
       if(!empty($parseHeader)) {
         $csvData .= implode($this->delimiter, $parseHeader).PHP_EOL;
