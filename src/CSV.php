@@ -312,11 +312,36 @@ class CSV {
   * @return string
   */
   function toCsv(array $header=NULL) : string {
+    $parseHeader = [];
     $parsedData = $this->toArray($header);
     $csvData = '';
     if(!empty($parsedData)) {
-      if(!empty($this->header)) {
-        $csvData .= implode($this->delimiter, $this->header).PHP_EOL;
+      if(!empty($header)) {
+        //Check header is valid or not
+        if(!empty($this->header)) {
+          if($this->ignoreHeaderCase == true) {
+            $ignoreHeaderCase = array_map('strtolower', $this->header);
+            $tmpHeader = array_combine($ignoreHeaderCase, $this->header);
+          } else {
+            $tmpHeader = array_combine($this->header, $this->header);
+          }
+        }
+        //Parse header data
+        foreach($header as $col) {
+          $tmpCol = $col;
+          if($this->ignoreHeaderCase == true) {
+            $col = strtolower($col);
+          }
+          if(!array_key_exists($col, $tmpHeader)) {
+            //Throw error header not found
+            throw new Exception("Error: '".$tmpCol."' header not found");
+          } else {
+            $parseHeader[$tmpCol] = $tmpHeader[$col];
+          }
+        }
+      }
+      if(!empty($parseHeader)) {
+        $csvData .= implode($this->delimiter, $parseHeader).PHP_EOL;
       }
       foreach($parsedData as $row) {
         $csvData .= implode($this->delimiter, $row).PHP_EOL;
