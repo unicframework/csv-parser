@@ -97,6 +97,17 @@ class CSV {
             //Throw error header not found
             throw new Exception('Error: Header not found');
           }
+        } else {
+          if($this->headerOffset == 0) {
+            //Remove header from data
+            array_shift($rawData);
+          } else if(isset($rawData[$this->headerOffset])) {
+            //Remove header from data
+            unset($rawData[$this->headerOffset]);
+          } else {
+            //Throw error header not found
+            throw new Exception('Error: Header not found');
+          }
         }
         //Parse body data
         $parseData = [];
