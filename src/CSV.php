@@ -340,7 +340,7 @@ class CSV {
           }
         }
       } else {
-        $parseHeader = $this->header;
+        $parseHeader = array_map('trim', $this->header);
       }
       if(!empty($parseHeader)) {
         $csvData .= implode($this->delimiter, $parseHeader).PHP_EOL;
