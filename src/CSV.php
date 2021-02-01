@@ -30,13 +30,17 @@ class CSV {
   */
   function parse($data) {
     $rawData = NULL;
+    $dataType = NULL;
     //Check data type
     if(is_array($data)) {
       $rawData = $data;
+      $dataType = 'array';
     } else if(is_object($data)) {
       $rawData = (array) $data;
+      $dataType = 'array';
     } else if($this->is_json($data)) {
       $rawData = json_decode($data, true);
+      $dataType = 'array';
     } else if(is_string($data)) {
       if(is_file($data)) {
         if(is_readable($data)) {
@@ -47,6 +51,7 @@ class CSV {
             $tmpData[] = array_map('trim', explode($this->delimiter, $row));
           }
           $rawData = $tmpData;
+          $dataType = 'csv';
         } else {
           //Throw error
           throw new Exception('Error: Can not read file, permission denied');
@@ -59,73 +64,58 @@ class CSV {
       //Throw error
       throw new Exception('Error: CSVParser invalid data type');
     }
+
+    //Parse header
+    if($dataType == 'array') {
+      if($this->ignoreHeader == false) {
+        //Parse user custom header
+        if(empty($this->header) && !empty($rawData)) {
+          if(isset($rawData[$this->headerOffset])) {
+            $this->header = array_keys($rawData[$this->headerOffset]);
+          } else {
+            throw new Exception('Error : header not found at offset '.$this->headerOffset);
+          }
+        }
+      }
+    } else {
+      if($this->ignoreHeader == false) {
+        //Parse user custom header
+        if(!empty($this->header)) {
+          //Ignore header
+          if(isset($rawData[$this->headerOffset])) {
+            unset($rawData[$this->headerOffset]);
+          }
+        } else {
+          if(isset($rawData[$this->headerOffset])) {
+            $this->header = $rawData[$this->headerOffset];
+            unset($rawData[$this->headerOffset]);
+          } else {
+            throw new Exception('Error : header not found at offset '.$this->headerOffset);
+          }
+        }
+      }
+    }
+
     //Parse data
     if(!empty($rawData)) {
-      if($this->ignoreHeader == true) {
-        if(!empty($this->header)) {
-          //Parse body data
-          $parseData = [];
-          foreach($rawData as $row) {
-            $tmpData = array();
-            foreach($row as $key => $value) {
-              if(isset($this->header[$key])) {
-                $tmpData[$this->header[$key]] = $value;
-              } else {
-                $tmpData[count($tmpData)] = $value;
-              }
-            }
-            if(!empty($tmpData)) {
-              $parseData[] = $tmpData;
-            }
-          }
-          $this->parsedData = $parseData;
-        } else {
-          $this->parsedData = $rawData;
-        }
-      } else {
-        //Parse header
-        if(empty($this->header)) {
-          if($this->headerOffset == 0) {
-            $this->header = $rawData[0];
-            //Remove header from data
-            array_shift($rawData);
-          } else if(isset($rawData[$this->headerOffset])) {
-            $this->header = $rawData[$this->headerOffset];
-            //Remove header from data
-            unset($rawData[$this->headerOffset]);
+      //Parse body data
+      $parseData = [];
+      foreach($rawData as $row) {
+        $tmpData = array();
+        $i = 0;
+        foreach($row as $key => $value) {
+          if(isset($this->header[$i])) {
+            $tmpData[$this->header[$i]] = $value;
           } else {
-            //Throw error header not found
-            throw new Exception('Error: Header not found');
+            $tmpData[count($tmpData)] = $value;
           }
-        } else {
-          if($this->headerOffset == 0) {
-            //Remove header from data
-            array_shift($rawData);
-          } else if(isset($rawData[$this->headerOffset])) {
-            //Remove header from data
-            unset($rawData[$this->headerOffset]);
-          } else {
-            //Throw error header not found
-            throw new Exception('Error: Header not found');
-          }
+          $i++;
         }
-        //Parse body data
-        $parseData = [];
-        foreach($rawData as $row) {
-          $tmpData = array();
-          foreach($row as $key => $value) {
-            if(isset($this->header[$key])) {
-              $tmpData[$this->header[$key]] = $value;
-            } else {
-              $tmpData[count($tmpData)] = $value;
-            }
-          }
-          if(!empty($tmpData)) {
-            $parseData[] = $tmpData;
-          }
+        if(!empty($tmpData)) {
+          $parseData[] = $tmpData;
         }
-        $this->parsedData = $parseData;
       }
+      $this->parsedData = $parseData;
     }
   }
 
@@ -223,66 +213,74 @@ class CSV {
   * @return array
   */
   function toArray(array $header=NULL) : array {
-    $parseHeader = [];
-    $parseData = [];
+    $parsedHeader = [];
+    $parsedData = [];
+    //Set data limit
+    if(!empty($this->limit)) {
+      if(isset($this->limit['start']) && isset($this->limit['end'])) {
+        $tmpParsedData = array_slice($this->parsedData, $this->limit['start'], $this->limit['end']);
+      } else if(isset($this->limit['start'])) {
+        $tmpParsedData = array_slice($this->parsedData, $this->limit['start']);
+      }
+    } else {
+      $tmpParsedData = $this->parsedData;
+    }
+
+    //Check header is valid or not
     if(!empty($header)) {
-      //Check header is valid or not
-      if(!empty($this->header)) {
-        if($this->ignoreHeaderCase == true) {
-          $ignoreHeaderCase = array_map('strtolower', $this->header);
-          $tmpHeader = array_combine($ignoreHeaderCase, $this->header);
-        } else {
-          $tmpHeader = array_combine($this->header, $this->header);
-        }
-      } else if(!empty($this->parsedData)) {
-        $tmpHeader = array_combine(array_keys($this->parsedData[0]), array_keys($this->parsedData[0]));
+      if(!empty($this->header) && $this->ignoreHeaderCase == true) {
+        $ignoreHeaderCase = array_map('strtolower', $this->header);
+        $tmpHeader = array_combine($ignoreHeaderCase, $this->header);
+      } else {
+        $tmpHeader = array_combine($this->header, $this->header);
       }
       //Parse header data
-      foreach($header as $col) {
-        $tmpCol = $col;
-        if($this->ignoreHeaderCase == true) {
-          $col = strtolower($col);
-        }
-        if(!array_key_exists($col, $tmpHeader)) {
-          //Throw error header not found
-          throw new Exception("Error: '".$tmpCol."' header not found");
-        } else {
-          $parseHeader[$tmpCol] = $tmpHeader[$col];
-        }
-      }
-      //Parse body data
-      if(!empty($this->limit)) {
-        if(isset($this->limit['start']) && isset($this->limit['end'])) {
-          $tmpParsedData = array_slice($this->parsedData, $this->limit['start'], $this->limit['end']);
-        } else if(isset($this->limit['start'])) {
-          $tmpParsedData = array_slice($this->parsedData, $this->limit['start']);
+      if(!empty($tmpHeader)) {
+        foreach($header as $col) {
+          $tmpCol = $col;
+          if($this->ignoreHeaderCase == true) {
+            $col = strtolower($col);
+          }
+          //Check header exists or not
+          if(!array_key_exists($col, $tmpHeader)) {
+            //Throw error header not found
+            throw new Exception("Error: '".$tmpCol."' header not found");
+          } else {
+            $parsedHeader[$tmpCol] = $tmpHeader[$col];
+          }
         }
       } else {
-        $tmpParsedData = $this->parsedData;
+        //Check header index exists or not
+        foreach($header as $col) {
+          if(is_int($col) && isset($tmpParsedData[$this->headerOffset])) {
+            $col = $col == 0 ? $col : $col - 1;
+            if(!array_key_exists($col, $tmpParsedData[$this->headerOffset])) {
+              //Throw error header not found
+              throw new Exception("Error: '".$col."' header not found");
+            } else {
+              $parsedHeader[$col] = $col;
+            }
+          } else {
+            //Throw error header not found
+            throw new Exception("Error: '".$col."' header not found");
+          }
+        }
       }
+
+      //Parse data
       foreach($tmpParsedData as $row) {
         $tmpRow = [];
-        foreach($parseHeader as $key => $val) {
+        foreach($parsedHeader as $key => $val) {
           $tmpRow[$key] = $row[$val];
         }
         if(!empty($tmpRow)) {
-          $parseData[] = $tmpRow;
+          $parsedData[] = $tmpRow;
         }
       }
     } else {
-      //Parse body data
-      if(!empty($this->limit)) {
-        if(isset($this->limit['start']) && isset($this->limit['end'])) {
-          $tmpParsedData = array_slice($this->parsedData, $this->limit['start'], $this->limit['end']);
-        } else if(isset($this->limit['start'])) {
-          $tmpParsedData = array_slice($this->parsedData, $this->limit['start']);
-        }
-        $parseData = $tmpParsedData;
-      } else {
-        $parseData = $this->parsedData;
-      }
+      $parsedData = $tmpParsedData;
     }
-    return $parseData;
+    return $parsedData;
   }
 
   /**
@@ -316,34 +314,12 @@ class CSV {
     $parsedData = $this->toArray($header);
     $csvData = '';
     if(!empty($parsedData)) {
-      if(!empty($header)) {
-        //Check header is valid or not
-        if(!empty($this->header)) {
-          if($this->ignoreHeaderCase == true) {
-            $ignoreHeaderCase = array_map('strtolower', $this->header);
-            $tmpHeader = array_combine($ignoreHeaderCase, $this->header);
-          } else {
-            $tmpHeader = array_combine($this->header, $this->header);
-          }
+      if(!empty($this->header)) {
+        if(!empty($header)) {
+          $csvData .= implode($this->delimiter, $header).PHP_EOL;
+        } else {
+          $csvData .= implode($this->delimiter, $this->header).PHP_EOL;
         }
-        //Parse header data
-        foreach($header as $col) {
-          $tmpCol = $col;
-          if($this->ignoreHeaderCase == true) {
-            $col = strtolower($col);
-          }
-          if(!array_key_exists($col, $tmpHeader)) {
-            //Throw error header not found
-            throw new Exception("Error: '".$tmpCol."' header not found");
-          } else {
-            $parseHeader[$tmpCol] = $tmpHeader[$col];
-          }
-        }
-      } else {
-        $parseHeader = array_map('trim', $this->header);
-      }
-      if(!empty($parseHeader)) {
-        $csvData .= implode($this->delimiter, $parseHeader).PHP_EOL;
       }
       foreach($parsedData as $row) {
         $csvData .= implode($this->delimiter, $row).PHP_EOL;
