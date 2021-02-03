@@ -104,7 +104,7 @@ class CSV {
         $tmpData = array();
         $i = 0;
         foreach($row as $key => $value) {
-          if(isset($this->header[$i])) {
+          if(isset($this->header[$i]) && $this->header[$i] != '') {
             $tmpData[$this->header[$i]] = $value;
           } else {
             $tmpData[count($tmpData)] = $value;
