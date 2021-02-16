@@ -19,6 +19,7 @@ class CSV {
   private $headerOffset = 0;
   private $header = [];
   private $rowCount = 0;
+  private $headerCount = 0;
   private $limit = [];
   private $parsedData = [];
 
@@ -176,6 +177,15 @@ class CSV {
   */
   function rowCount() : int {
     return count($this->parsedData);
+  }
+
+  /**
+  * Get parsed data header count
+  *
+  * @return integer
+  */
+  function headerCount() : int {
+    return count($this->header);
   }
 
   /**
