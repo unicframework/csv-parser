@@ -18,7 +18,6 @@ class CSV {
   private $ignoreHeaderCase = true;
   private $headerOffset = 0;
   private $header = [];
-  private $rowCount = 0;
   private $headerCount = 0;
   private $limit = [];
   private $parsedData = [];
