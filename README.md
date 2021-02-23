@@ -9,7 +9,7 @@
 
 ### Features
 
-- Parse data from csv file, array and object.
+- Parse data from csv file, array, json and objects.
 - Parse csv to array and array to csv.
 - Parse csv to object and object to csv.
 - Parse csv to json and json to csv.
@@ -76,8 +76,11 @@ $data = $csv->toCsv(['Name', 'Email']);
 ### Get row count
 
 ```php
-//Get rowCount
+//Get row count
 $rows = $csv->rowCount();
+
+//Get header count
+$cols = $csv->headerCount();
 ```
 
 ### Select data limit
