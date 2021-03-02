@@ -241,6 +241,22 @@ class CSV {
   }
 
   /**
+  * Get average of given field
+  *
+  * @param $field
+  * @return integer|float
+  */
+  function average(string $field) {
+    $data= array_column($this->toArray([$field]), $field);
+    $count = count($data);
+    if($count > 0) {
+      return array_sum($data)/$count;
+    } else {
+      return array_sum($data);
+    }
+  }
+
+  /**
   * Set data limit
   *
   * @param array $limit
