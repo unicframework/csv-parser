@@ -150,6 +150,9 @@ $min_price = $csv->min('price');
 
 //Get maximum from given field
 $max_price = $csv->max('price');
+
+//Get average of given field
+$average_price = $csv->average('price');
 ```
 
 ## License
