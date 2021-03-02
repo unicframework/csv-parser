@@ -146,10 +146,10 @@ $csv->parse('data.csv');
 $total_price = $csv->sum('price');
 
 //Get minimum from given field
-$max_price = $csv->min('price');
+$min_price = $csv->min('price');
 
 //Get maximum from given field
-$min_price = $csv->max('price');
+$max_price = $csv->max('price');
 ```
 
 ## License
