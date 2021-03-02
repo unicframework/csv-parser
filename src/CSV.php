@@ -14,6 +14,7 @@ use Exception;
 
 class CSV {
   private $delimiter = ',';
+  private $enclosure = '"';
   private $ignoreHeader = false;
   private $ignoreHeaderCase = true;
   private $headerOffset = 0;
@@ -48,7 +49,10 @@ class CSV {
           $fileData = file($data, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
           $tmpData = [];
           foreach($fileData as $row) {
-            $tmpData[] = array_map('trim', explode($this->delimiter, $row));
+            $tmpData[] = array_map(function($value) {
+              $data = trim($value);
+              return is_string($data) ? trim($data, $this->enclosure) : $data;
+            }, explode($this->delimiter, $row));
           }
           $rawData = $tmpData;
           $dataType = 'csv';
@@ -130,6 +134,16 @@ class CSV {
   }
 
   /**
+  * Set csv enclosure
+  *
+  * @param string $enclosure
+  * @return void
+  */
+  function setEnclosure(string $enclosure) {
+    $this->enclosure = $enclosure;
+  }
+
+  /**
   * Ignore csv header
   *
   * @param boolean $ignore
@@ -170,6 +184,15 @@ class CSV {
   }
 
   /**
+  * Get csv header
+  *
+  * @return array
+  */
+  function getHeader() {
+    return $this->header;
+  }
+
+  /**
   * Get parsed data row count
   *
   * @return integer
@@ -185,6 +208,36 @@ class CSV {
   */
   function headerCount() : int {
     return count($this->header);
+  }
+
+  /**
+  * Get sum of given field
+  *
+  * @param $field
+  * @return integer|float
+  */
+  function sum(string $field) {
+    return array_sum(array_column($this->toArray([$field]), $field));
+  }
+
+  /**
+  * Get min of given field
+  *
+  * @param $field
+  * @return mixed
+  */
+  function min(string $field) {
+    return min(array_column($this->toArray([$field]), $field));
+  }
+
+  /**
+  * Get max of given field
+  *
+  * @param $field
+  * @return mixed
+  */
+  function max(string $field) {
+    return max(array_column($this->toArray([$field]), $field));
   }
 
   /**

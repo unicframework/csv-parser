@@ -48,6 +48,9 @@ $csv->parse($objectData);
 ### Get parsed data
 
 ```php
+//Get header
+$header = $csv->getHeader();
+
 //Get parsed data to array format
 $data = $csv->toArray();
 
@@ -121,11 +124,32 @@ $csv->setHeader(['Name', 'Email']);
 //Set delimiter
 $csv->setDelimiter('|');
 
+//Set enclosure
+$csv->setEnclosure('"');
+
 //Parse csv file data
 $csv->parse('data.csv');
 
 //Get data from parsed data
 $data = $csv->toArray();
+```
+
+
+### Other features
+
+```php
+
+//Parse csv file data
+$csv->parse('data.csv');
+
+//Get total sum of given field
+$total_price = $csv->sum('price');
+
+//Get maximum from given field
+$max_price = $csv->max('price');
+
+//Get maximum from given field
+$min_price = $csv->min('price');
 ```
 
 ## License
