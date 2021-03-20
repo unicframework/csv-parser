@@ -17,6 +17,7 @@ class CSV {
   private $enclosure = '"';
   private $ignoreHeader = false;
   private $ignoreHeaderCase = true;
+  private $ignoreEnclosure = false;
   private $headerOffset = 0;
   private $header = [];
   private $headerCount = 0;
@@ -51,7 +52,12 @@ class CSV {
           foreach($fileData as $row) {
             $tmpData[] = array_map(function($value) {
               $data = trim($value);
-              return is_string($data) ? trim($data, $this->enclosure) : $data;
+              //Remove enclosure
+              if($this->ignoreEnclosure === true) {
+                return $data;
+              } else {
+                return is_string($data) ? trim($data, $this->enclosure) : $data;
+              }
             }, explode($this->delimiter, $row));
           }
           $rawData = $tmpData;
@@ -161,6 +167,16 @@ class CSV {
   */
   function ignoreHeaderCase(bool $ignore) {
     $this->ignoreHeaderCase = $ignore;
+  }
+
+  /**
+  * Ignore csv enclosure
+  *
+  * @param string $ignore
+  * @return void
+  */
+  function ignoreEnclosure(string $ignore) {
+    $this->ignoreEnclosure = $ignore;
   }
 
   /**
