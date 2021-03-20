@@ -108,6 +108,9 @@ $csv->ignoreHeader(true);
 //Ignore csv header cse
 $csv->ignoreHeaderCase(true);
 
+//Ignore csv enclosure
+$csv->ignoreEnclosure(true);
+
 //Set header offset of csv file
 $csv->headerOffset(0);
 
