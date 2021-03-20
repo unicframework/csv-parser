@@ -24,7 +24,7 @@
 composer require unicframework/csv-parser
 ```
 
-### Parse data
+### Parse Data
 
 ```php
 use CSVParser\CSV;
@@ -45,7 +45,7 @@ $csv->parse($objectData);
 ```
 
 
-### Get parsed data
+### Get Parsed Data
 
 ```php
 //Get header
@@ -76,7 +76,7 @@ $data = $csv->toCsv();
 $data = $csv->toCsv(['Name', 'Email']);
 ```
 
-### Get row count
+### Get Row Count
 
 ```php
 //Get row count
@@ -86,7 +86,7 @@ $rows = $csv->rowCount();
 $cols = $csv->headerCount();
 ```
 
-### Select data limit
+### Select Data Limit
 
 ```php
 //Select 10 records
@@ -116,7 +116,7 @@ $csv->setHeader(['Name', 'Email']);
 ```
 
 
-### Set CSV delimiter
+### Set CSV Delimiter
 
   Default csv delimiter is `,` but we can set other delimiter for csv file.
 
@@ -135,7 +135,7 @@ $data = $csv->toArray();
 ```
 
 
-### Other features
+### Aggregate Functions
 
 ```php
 
