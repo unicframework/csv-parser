@@ -20,7 +20,6 @@ class CSV {
   private $ignoreEnclosure = false;
   private $headerOffset = 0;
   private $header = [];
-  private $headerCount = 0;
   private $limit = [];
   private $parsedData = [];
 
@@ -30,7 +29,7 @@ class CSV {
   * @param string $data
   * @return void
   */
-  function parse($data) {
+  public function parse($data) {
     $rawData = NULL;
     $dataType = NULL;
     //Check data type
@@ -135,7 +134,7 @@ class CSV {
   * @param string $delimiter
   * @return void
   */
-  function setDelimiter(string $delimiter) {
+  public function setDelimiter(string $delimiter) {
     $this->delimiter = $delimiter;
   }
 
@@ -145,7 +144,7 @@ class CSV {
   * @param string $enclosure
   * @return void
   */
-  function setEnclosure(string $enclosure) {
+  public function setEnclosure(string $enclosure) {
     $this->enclosure = $enclosure;
   }
 
@@ -155,7 +154,7 @@ class CSV {
   * @param boolean $ignore
   * @return void
   */
-  function ignoreHeader(bool $ignore) {
+  public function ignoreHeader(bool $ignore) {
     $this->ignoreHeader = $ignore;
   }
 
@@ -165,7 +164,7 @@ class CSV {
   * @param boolean $ignore
   * @return void
   */
-  function ignoreHeaderCase(bool $ignore) {
+  public function ignoreHeaderCase(bool $ignore) {
     $this->ignoreHeaderCase = $ignore;
   }
 
@@ -175,7 +174,7 @@ class CSV {
   * @param string $ignore
   * @return void
   */
-  function ignoreEnclosure(string $ignore) {
+  public function ignoreEnclosure(string $ignore) {
     $this->ignoreEnclosure = $ignore;
   }
 
@@ -185,7 +184,7 @@ class CSV {
   * @param integer $offset
   * @return void
   */
-  function headerOffset(int $offset) {
+  public function headerOffset(int $offset) {
     $this->headerOffset = $offset;
   }
 
@@ -195,7 +194,7 @@ class CSV {
   * @param array $header
   * @return void
   */
-  function setHeader(array $header) {
+  public function setHeader(array $header) {
     $this->header = $header;
   }
 
@@ -204,7 +203,7 @@ class CSV {
   *
   * @return array
   */
-  function getHeader() {
+  public function getHeader() {
     return $this->header;
   }
 
@@ -213,7 +212,7 @@ class CSV {
   *
   * @return integer
   */
-  function rowCount() : int {
+  public function rowCount() : int {
     return count($this->parsedData);
   }
 
@@ -222,7 +221,7 @@ class CSV {
   *
   * @return integer
   */
-  function headerCount() : int {
+  public function headerCount() : int {
     return count($this->header);
   }
 
@@ -232,7 +231,7 @@ class CSV {
   * @param $field
   * @return integer|float
   */
-  function sum(string $field) {
+  public function sum(string $field) {
     return array_sum(array_column($this->toArray([$field]), $field));
   }
 
@@ -242,7 +241,7 @@ class CSV {
   * @param $field
   * @return mixed
   */
-  function min(string $field) {
+  public function min(string $field) {
     return min(array_column($this->toArray([$field]), $field));
   }
 
@@ -252,7 +251,7 @@ class CSV {
   * @param $field
   * @return mixed
   */
-  function max(string $field) {
+  public function max(string $field) {
     return max(array_column($this->toArray([$field]), $field));
   }
 
@@ -262,7 +261,7 @@ class CSV {
   * @param $field
   * @return integer|float
   */
-  function average(string $field) {
+  public function average(string $field) {
     $data= array_column($this->toArray([$field]), $field);
     $count = count($data);
     if($count > 0) {
@@ -278,7 +277,7 @@ class CSV {
   * @param array $limit
   * @return void
   */
-  function limit(...$limit) {
+  public function limit(...$limit) {
     if(count($limit) == 2) {
       if(isset($limit[0])) {
         $this->limit['start'] = (int) $limit[0];
@@ -306,7 +305,7 @@ class CSV {
   * @param array $header
   * @return array
   */
-  function toArray(array $header=NULL) : array {
+  public function toArray(array $header=NULL) : array {
     $parsedHeader = [];
     $parsedData = [];
     //Set data limit
@@ -374,6 +373,7 @@ class CSV {
     } else {
       $parsedData = $tmpParsedData;
     }
+    $this->limit = [];
     return $parsedData;
   }
 
@@ -383,7 +383,7 @@ class CSV {
   * @param array $header
   * @return object
   */
-  function toObject(array $header=NULL) : object {
+  public function toObject(array $header=NULL) : object {
     return (object) $this->toArray($header);
   }
 
@@ -393,7 +393,7 @@ class CSV {
   * @param array $header
   * @return string
   */
-  function toJson(array $header=NULL) : string {
+  public function toJson(array $header=NULL) : string {
     return json_encode($this->toArray($header));
   }
 
@@ -403,7 +403,7 @@ class CSV {
   * @param array $header
   * @return string
   */
-  function toCsv(array $header=NULL) : string {
+  public function toCsv(array $header=NULL) : string {
     $parseHeader = [];
     $parsedData = $this->toArray($header);
     $csvData = '';
