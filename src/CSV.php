@@ -404,17 +404,16 @@ class CSV {
   * @return string
   */
   public function toCsv(array $header=NULL) : string {
-    $parseHeader = [];
     $parsedData = $this->toArray($header);
     $csvData = '';
-    if(!empty($parsedData)) {
-      if(!empty($this->header)) {
-        if(!empty($header)) {
-          $csvData .= implode($this->delimiter, $header).PHP_EOL;
-        } else {
-          $csvData .= implode($this->delimiter, $this->header).PHP_EOL;
-        }
+    if(!empty($this->header)) {
+      if(!empty($header)) {
+        $csvData .= implode($this->delimiter, $header).PHP_EOL;
+      } else {
+        $csvData .= implode($this->delimiter, $this->header).PHP_EOL;
       }
+    }
+    if(!empty($parsedData)) {
       foreach($parsedData as $row) {
         $csvData .= implode($this->delimiter, $row).PHP_EOL;
       }
