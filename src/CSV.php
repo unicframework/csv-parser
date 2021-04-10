@@ -408,14 +408,29 @@ class CSV {
     $csvData = '';
     if(!empty($this->header)) {
       if(!empty($header)) {
-        $csvData .= implode($this->delimiter, $header).PHP_EOL;
+        //Add csv enclosure
+        if($this->ignoreEnclosure === false) {
+          $csvData .= $this->enclosure.implode($this->enclosure.$this->delimiter.$this->enclosure, $header).$this->enclosure.PHP_EOL;
+        } else {
+          $csvData .= implode($this->delimiter, $header).PHP_EOL;
+        }
       } else {
-        $csvData .= implode($this->delimiter, $this->header).PHP_EOL;
+        //Add csv enclosure
+        if($this->ignoreEnclosure === false) {
+          $csvData .= $this->enclosure.implode($this->enclosure.$this->delimiter.$this->enclosure, $this->header).$this->enclosure.PHP_EOL;
+        } else {
+          $csvData .= implode($this->delimiter, $this->header).PHP_EOL;
+        }
       }
     }
     if(!empty($parsedData)) {
       foreach($parsedData as $row) {
-        $csvData .= implode($this->delimiter, $row).PHP_EOL;
+        //Add csv enclosure
+        if($this->ignoreEnclosure === false) {
+          $csvData .= $this->enclosure.implode($this->enclosure.$this->delimiter.$this->enclosure, $row).$this->enclosure.PHP_EOL;
+        } else {
+          $csvData .= implode($this->delimiter, $row).PHP_EOL;
+        }
       }
     }
     return $csvData;
