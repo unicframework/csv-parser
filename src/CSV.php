@@ -57,7 +57,7 @@ class CSV {
               } else {
                 return is_string($data) ? trim($data, $this->enclosure) : $data;
               }
-            }, explode($this->delimiter, $row));
+            }, str_getcsv($row, $this->delimiter, $this->enclosure));
           }
           $rawData = $tmpData;
           $dataType = 'csv';
