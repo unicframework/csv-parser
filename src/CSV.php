@@ -80,7 +80,7 @@ class CSV {
         //Parse user custom header
         if(empty($this->header) && !empty($rawData)) {
           if(isset($rawData[$this->headerOffset])) {
-            $this->header = array_keys($rawData[$this->headerOffset]);
+            $this->header = array_keys((array)$rawData[$this->headerOffset]);
           } else {
             throw new Exception('Error : header not found at offset '.$this->headerOffset);
           }
