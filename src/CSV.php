@@ -15,6 +15,7 @@ use Exception;
 class CSV {
   private $delimiter = ',';
   private $enclosure = '"';
+  private $escape = '\\';
   private $ignoreHeader = false;
   private $ignoreHeaderCase = true;
   private $ignoreEnclosure = false;
@@ -46,18 +47,21 @@ class CSV {
       if(is_file($data)) {
         if(is_readable($data)) {
           //Read data from file
-          $fileData = file($data, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
           $tmpData = [];
-          foreach($fileData as $row) {
+          $fileStream = fopen($data, "r");
+          if(function_exists('ini_set')) {
+            ini_set('auto_detect_line_endings', true);
+          }
+          while(($row = fgetcsv($fileStream, 0, $this->delimiter, $this->enclosure, $this->escape)) !== FALSE) {
             $tmpData[] = array_map(function($value) {
-              $data = trim($value);
+              $tmpValue = trim($value);
               //Remove enclosure
               if($this->ignoreEnclosure === true) {
-                return $data;
+                return $tmpValue;
               } else {
-                return is_string($data) ? trim($data, $this->enclosure) : $data;
+                return is_string($tmpValue) ? trim($tmpValue, $this->enclosure) : $tmpValue;
               }
-            }, str_getcsv($row, $this->delimiter, $this->enclosure));
+            }, $row);
           }
           $rawData = $tmpData;
           $dataType = 'csv';
@@ -146,6 +150,16 @@ class CSV {
   */
   public function setEnclosure(string $enclosure) {
     $this->enclosure = $enclosure;
+  }
+
+  /**
+  * Set csv escape
+  *
+  * @param string $escape
+  * @return void
+  */
+  public function setEscape(string $escape) {
+    $this->escape = $escape;
   }
 
   /**
