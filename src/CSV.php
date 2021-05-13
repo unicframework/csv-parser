@@ -419,21 +419,21 @@ class CSV {
   */
   public function toCsv(array $header=NULL) : string {
     $parsedData = $this->toArray($header);
-    $csvData = '';
+    $fileStream = fopen('php://memory', 'r+');
     if(!empty($this->header)) {
       if(!empty($header)) {
         //Add csv enclosure
         if($this->ignoreEnclosure === false) {
-          $csvData .= $this->enclosure.implode($this->enclosure.$this->delimiter.$this->enclosure, $header).$this->enclosure.PHP_EOL;
+          fputcsv($fileStream, $header, $this->delimiter, $this->enclosure, $this->escape);
         } else {
-          $csvData .= implode($this->delimiter, $header).PHP_EOL;
+          fputcsv($fileStream, $header, $this->delimiter, '', $this->escape);
         }
       } else {
         //Add csv enclosure
         if($this->ignoreEnclosure === false) {
-          $csvData .= $this->enclosure.implode($this->enclosure.$this->delimiter.$this->enclosure, $this->header).$this->enclosure.PHP_EOL;
+          fputcsv($fileStream, $this->header, $this->delimiter, $this->enclosure, $this->escape);
         } else {
-          $csvData .= implode($this->delimiter, $this->header).PHP_EOL;
+          fputcsv($fileStream, $this->header, $this->delimiter, '', $this->escape);
         }
       }
     }
@@ -441,12 +441,14 @@ class CSV {
       foreach($parsedData as $row) {
         //Add csv enclosure
         if($this->ignoreEnclosure === false) {
-          $csvData .= $this->enclosure.implode($this->enclosure.$this->delimiter.$this->enclosure, $row).$this->enclosure.PHP_EOL;
+          fputcsv($fileStream, $row, $this->delimiter, $this->enclosure, $this->escape);
         } else {
-          $csvData .= implode($this->delimiter, $row).PHP_EOL;
+          fputcsv($fileStream, $row, $this->delimiter, '', $this->escape);
         }
       }
     }
+    rewind($fileStream);
+    $csvData = stream_get_contents($fileStream);
     return $csvData;
   }
 
