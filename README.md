@@ -130,6 +130,9 @@ $csv->setDelimiter('|');
 //Set enclosure
 $csv->setEnclosure('"');
 
+//Set escape character
+$csv->setEscape('//');
+
 //Parse csv file data
 $csv->parse('data.csv');
 
