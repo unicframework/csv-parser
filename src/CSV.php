@@ -419,7 +419,7 @@ class CSV {
   */
   public function toCsv(array $header=NULL) : string {
     $parsedData = $this->toArray($header);
-    $fileStream = fopen('php://memory', 'r+');
+    $fileStream = fopen('php://temp', 'r+');
     if(!empty($this->header)) {
       if(!empty($header)) {
         //Add csv enclosure
